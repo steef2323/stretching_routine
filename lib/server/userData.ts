@@ -32,7 +32,7 @@ export async function fetchUserData(userId: string): Promise<CloudSyncResponse> 
 
   const stretchDays =
     settingsRows.length > 0
-      ? (settingsRows[0].stretch_days as number[])
+      ? parseStretchDays(settingsRows[0].stretch_days)
       : [...DEFAULT_STRETCH_DAYS];
 
   const routines: Partial<Record<RoutineId, (string | null)[]>> = {};
@@ -70,9 +70,11 @@ export async function saveUserData(
   await ensureSchema();
   const sql = getSql();
 
+  const stretchDaysJson = JSON.stringify(payload.stretchDays);
+
   await sql`
     INSERT INTO user_settings (user_id, stretch_days, updated_at)
-    VALUES (${userId}, ${payload.stretchDays}, NOW())
+    VALUES (${userId}, ${stretchDaysJson}::jsonb, NOW())
     ON CONFLICT (user_id)
     DO UPDATE SET
       stretch_days = EXCLUDED.stretch_days,
@@ -81,9 +83,11 @@ export async function saveUserData(
 
   for (const routineId of ROUTINE_IDS) {
     const slots = normalizeSlots(payload.routines[routineId] ?? defaultSlots());
+    const slotsJson = JSON.stringify(slots);
+
     await sql`
       INSERT INTO user_routines (user_id, routine_id, slots, updated_at)
-      VALUES (${userId}, ${routineId}, ${slots}, NOW())
+      VALUES (${userId}, ${routineId}, ${slotsJson}::jsonb, NOW())
       ON CONFLICT (user_id, routine_id)
       DO UPDATE SET
         slots = EXCLUDED.slots,
@@ -118,6 +122,27 @@ export async function saveUserData(
 
 function defaultSlots(): (string | null)[] {
   return [null, null, null, null, null];
+}
+
+function parseStretchDays(value: unknown): number[] {
+  if (Array.isArray(value)) {
+    const days = value.filter((day): day is number => typeof day === "number");
+    return days.length > 0 ? days : [...DEFAULT_STRETCH_DAYS];
+  }
+
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value) as unknown;
+      if (Array.isArray(parsed)) {
+        const days = parsed.filter((day): day is number => typeof day === "number");
+        return days.length > 0 ? days : [...DEFAULT_STRETCH_DAYS];
+      }
+    } catch {
+      return [...DEFAULT_STRETCH_DAYS];
+    }
+  }
+
+  return [...DEFAULT_STRETCH_DAYS];
 }
 
 function parseSlots(value: unknown): (string | null)[] {
