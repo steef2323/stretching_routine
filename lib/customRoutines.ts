@@ -3,6 +3,16 @@ import type { IllustrationKey } from "./exerciseTypes";
 import { ROUTINES, type Routine, type RoutineId, type Stretch } from "./routines";
 
 const STORAGE_KEY = "stretchy-custom-routines";
+
+const cloudPushHooks: Array<() => void> = [];
+
+export function registerRoutinesCloudPush(hook: () => void): void {
+  cloudPushHooks.push(hook);
+}
+
+function notifyCloudPush(): void {
+  cloudPushHooks.forEach((hook) => hook());
+}
 const SLOT_COUNT = 5;
 
 export type RoutineSlots = (string | null)[];
@@ -50,6 +60,7 @@ export function saveRoutineSlots(routineId: RoutineId, slots: RoutineSlots): voi
     data[routineId]!.push(null);
   }
   writeCustom(data);
+  notifyCloudPush();
 }
 
 export function slotsToStretches(slots: RoutineSlots): Stretch[] {

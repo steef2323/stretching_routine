@@ -53,7 +53,7 @@ export default function StretchPill({
         <button
           type="button"
           className="pill-main"
-          onClick={variant === "selectable" ? onSelect : onToggleExpand}
+          onClick={variant === "selectable" ? onSelect : undefined}
         >
           <span className="pill-name">{exercise.name}</span>
           <span className="pill-focus">{exercise.focus}</span>
@@ -68,33 +68,46 @@ export default function StretchPill({
             ×
           </button>
         )}
-        {variant === "selectable" && (
+        {onToggleExpand && (
           <button
             type="button"
-            className="pill-expand"
+            className={`pill-expand ${expanded ? "pill-expand-open" : ""}`}
             onClick={onToggleExpand}
-            aria-label={expanded ? "Collapse" : "Expand"}
+            aria-label={expanded ? "Hide details" : "Show stretch details"}
+            aria-expanded={expanded}
           >
-            {expanded ? "−" : "+"}
-          </button>
-        )}
-        {variant === "filled" && onToggleExpand && (
-          <button
-            type="button"
-            className="pill-expand"
-            onClick={onToggleExpand}
-            aria-label={expanded ? "Collapse" : "Expand"}
-          >
-            {expanded ? "−" : "+"}
+            <ChevronIcon />
           </button>
         )}
       </div>
       {expanded && (
         <div className="pill-details">
           <StretchIllustration illustration={exercise.illustration} />
+          <p className="pill-cue">{exercise.cue}</p>
           <p className="pill-explanation">{exercise.explanation}</p>
         </div>
       )}
     </div>
+  );
+}
+
+function ChevronIcon() {
+  return (
+    <svg
+      className="pill-chevron"
+      viewBox="0 0 16 16"
+      width="16"
+      height="16"
+      aria-hidden
+    >
+      <path
+        d="M4 6 L8 10 L12 6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }

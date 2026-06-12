@@ -2,6 +2,16 @@ import type { RoutineId } from "./routines";
 import { formatLocalDate, isSameLocalDay } from "./schedule";
 import { getStretchDays } from "./stretchDays";
 
+const cloudPushHooks: Array<() => void> = [];
+
+export function registerStorageCloudPush(hook: () => void): void {
+  cloudPushHooks.push(hook);
+}
+
+function notifyCloudPush(): void {
+  cloudPushHooks.forEach((hook) => hook());
+}
+
 export interface SessionRecord {
   date: string;
   routineId: RoutineId;
@@ -44,6 +54,7 @@ export function saveSession(
   const sessions = readSessions().filter((s) => s.date !== record.date);
   sessions.push(record);
   writeSessions(sessions);
+  notifyCloudPush();
 
   return record;
 }

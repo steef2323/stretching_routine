@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   calculateCurrentStreak,
   calculateLongestStreak,
@@ -16,10 +16,21 @@ export default function Calendar() {
   const [viewYear, setViewYear] = useState(today.getFullYear());
   const [viewMonth, setViewMonth] = useState(today.getMonth());
 
-  const completedDates = useMemo(() => getCompletedDates(), []);
-  const currentStreak = useMemo(() => calculateCurrentStreak(), []);
-  const longestStreak = useMemo(() => calculateLongestStreak(), []);
-  const stretchDays = useMemo(() => new Set(getStretchDays()), []);
+  const [dataVersion, setDataVersion] = useState(0);
+
+  const refreshData = useCallback(() => {
+    setDataVersion((v) => v + 1);
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("stretchy-data-updated", refreshData);
+    return () => window.removeEventListener("stretchy-data-updated", refreshData);
+  }, [refreshData]);
+
+  const completedDates = useMemo(() => getCompletedDates(), [dataVersion]);
+  const currentStreak = useMemo(() => calculateCurrentStreak(), [dataVersion]);
+  const longestStreak = useMemo(() => calculateLongestStreak(), [dataVersion]);
+  const stretchDays = useMemo(() => new Set(getStretchDays()), [dataVersion]);
 
   const monthLabel = new Date(viewYear, viewMonth, 1).toLocaleDateString(
     undefined,

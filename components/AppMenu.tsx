@@ -9,6 +9,7 @@ const MENU_ITEMS = [
   { href: "/exercises", label: "Select my Stretchy" },
   { href: "/days", label: "Select my days" },
   { href: "/help", label: "Let Stretchy help you" },
+  { href: "/account", label: "Save my Stretchy" },
 ] as const;
 
 export default function AppMenu() {

@@ -48,6 +48,7 @@ function SortableSlot({
   onRemove: (index: number) => void;
 }) {
   const router = useRouter();
+  const [expanded, setExpanded] = useState(false);
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id });
 
@@ -65,6 +66,7 @@ function SortableSlot({
         <StretchPill
           variant="filled"
           exercise={exercise}
+          expanded={expanded}
           dragHandle={
             <button
               type="button"
@@ -76,6 +78,7 @@ function SortableSlot({
               ⠿
             </button>
           }
+          onToggleExpand={() => setExpanded((open) => !open)}
           onRemove={() => onRemove(slotIndex)}
         />
       ) : (
@@ -139,7 +142,9 @@ export default function ExerciseDayEditor({ routineId }: ExerciseDayEditorProps)
           <h1 className="exercises-title">{ROUTINE_DAY_LABELS[routineId]}</h1>
           <HamburgerButton />
         </div>
-        <p className="exercises-subtitle">Drag to reorder · tap × to remove</p>
+        <p className="exercises-subtitle">
+          Drag to reorder · tap ˅ for details · tap × to remove
+        </p>
       </header>
 
       <DndContext

@@ -3,6 +3,16 @@ export const OPTIMAL_DAYS_PER_WEEK = 3;
 
 const STORAGE_KEY = "stretchy-stretch-days";
 
+const cloudPushHooks: Array<() => void> = [];
+
+export function registerStretchDaysCloudPush(hook: () => void): void {
+  cloudPushHooks.push(hook);
+}
+
+function notifyCloudPush(): void {
+  cloudPushHooks.forEach((hook) => hook());
+}
+
 export const WEEKDAY_OPTIONS = [
   { dow: 1, label: "Monday" },
   { dow: 2, label: "Tuesday" },
@@ -49,6 +59,7 @@ export function saveStretchDays(days: number[]): void {
   const normalized = normalizeDays(days);
   if (normalized.length === 0) return;
   writeStretchDays(normalized);
+  notifyCloudPush();
 }
 
 export function isDayStretchDay(dayOfWeek: number, days?: number[]): boolean {

@@ -1,4 +1,6 @@
+import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata, Viewport } from "next";
+import SyncProvider from "@/components/SyncProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -26,7 +28,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <ClerkProvider>
+          <SyncProvider>{children}</SyncProvider>
+        </ClerkProvider>
+      </body>
     </html>
   );
 }

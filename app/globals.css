@@ -702,6 +702,22 @@ button {
   background: transparent;
 }
 
+.pill-chevron {
+  display: block;
+  transition: transform 0.2s ease;
+}
+
+.pill-expand-open .pill-chevron {
+  transform: rotate(180deg);
+}
+
+.pill-cue {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text);
+  line-height: 1.4;
+}
+
 .pill-remove:active,
 .pill-expand:active,
 .pill-drag:active {
@@ -724,9 +740,10 @@ button {
 
 .stretch-illustration {
   width: 100%;
-  max-width: 200px;
+  max-width: 240px;
   margin: 0 auto;
   display: block;
+  padding: 0.5rem 0;
 }
 
 .stretch-info-illustration {
@@ -983,4 +1000,44 @@ button {
 .help-stretch-name {
   font-size: 1rem;
   color: var(--color-text);
+}
+
+/* Auth & account */
+
+.screen-auth {
+  align-items: center;
+  justify-content: center;
+}
+
+.account-menu {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.account-sign-in {
+  width: 100%;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.account-hint {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  line-height: 1.4;
+  text-align: center;
+}
+
+.account-signed-in {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 0;
+}
+
+.account-home {
+  margin-top: auto;
 }
