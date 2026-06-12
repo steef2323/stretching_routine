@@ -29,7 +29,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <ClerkProvider>
+        <ClerkProvider
+          signInForceRedirectUrl="/"
+          signUpForceRedirectUrl="/"
+        >
           <SyncProvider>{children}</SyncProvider>
         </ClerkProvider>
       </body>

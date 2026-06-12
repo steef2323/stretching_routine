@@ -12,7 +12,7 @@ export default function AccountMenu() {
   return (
     <div className="account-menu">
       <Show when="signed-out">
-        <SignInButton mode="modal">
+        <SignInButton mode="modal" forceRedirectUrl="/">
           <button type="button" className="menu-item account-sign-in">
             Sign in to save
           </button>
