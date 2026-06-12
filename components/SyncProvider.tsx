@@ -30,13 +30,34 @@ export default function SyncProvider({
       return;
     }
 
+    activateCloudSync();
+
     if (wasSignedIn === false || wasSignedIn === null) {
       void hydrateFromCloud();
-      return;
+    }
+  }, [isSignedIn, isLoaded]);
+
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn) return;
+
+    function refreshFromCloud() {
+      void hydrateFromCloud();
     }
 
-    activateCloudSync();
-  }, [isSignedIn, isLoaded]);
+    function onVisibilityChange() {
+      if (document.visibilityState === "visible") {
+        refreshFromCloud();
+      }
+    }
+
+    window.addEventListener("focus", refreshFromCloud);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    return () => {
+      window.removeEventListener("focus", refreshFromCloud);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+  }, [isLoaded, isSignedIn]);
 
   return children;
 }

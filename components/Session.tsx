@@ -35,7 +35,14 @@ export default function Session({ routineId, isAnyway }: SessionProps) {
   const advancedAtZeroRef = useRef(false);
 
   useEffect(() => {
-    setRoutine(getEffectiveRoutine(routineId));
+    function refreshRoutine() {
+      setRoutine(getEffectiveRoutine(routineId));
+    }
+
+    refreshRoutine();
+    window.addEventListener("stretchy-data-updated", refreshRoutine);
+    return () =>
+      window.removeEventListener("stretchy-data-updated", refreshRoutine);
   }, [routineId]);
 
   useEffect(() => {

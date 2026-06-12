@@ -98,8 +98,14 @@ export default function ExerciseDayEditor({ routineId }: ExerciseDayEditorProps)
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    setSlots(getRoutineSlots(routineId));
-    setReady(true);
+    function refreshSlots() {
+      setSlots(getRoutineSlots(routineId));
+      setReady(true);
+    }
+
+    refreshSlots();
+    window.addEventListener("stretchy-data-updated", refreshSlots);
+    return () => window.removeEventListener("stretchy-data-updated", refreshSlots);
   }, [routineId]);
 
   const sensors = useSensors(

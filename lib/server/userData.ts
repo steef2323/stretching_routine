@@ -40,7 +40,7 @@ export async function fetchUserData(userId: string): Promise<CloudSyncResponse> 
   for (const row of routineRows) {
     const id = row.routine_id as RoutineId;
     if (ROUTINE_IDS.includes(id)) {
-      routines[id] = normalizeSlots(row.slots as (string | null)[]);
+      routines[id] = parseSlots(row.slots);
     }
   }
 
@@ -72,7 +72,7 @@ export async function saveUserData(
 
   await sql`
     INSERT INTO user_settings (user_id, stretch_days, updated_at)
-    VALUES (${userId}, ${JSON.stringify(payload.stretchDays)}, NOW())
+    VALUES (${userId}, ${payload.stretchDays}, NOW())
     ON CONFLICT (user_id)
     DO UPDATE SET
       stretch_days = EXCLUDED.stretch_days,
@@ -83,7 +83,7 @@ export async function saveUserData(
     const slots = normalizeSlots(payload.routines[routineId] ?? defaultSlots());
     await sql`
       INSERT INTO user_routines (user_id, routine_id, slots, updated_at)
-      VALUES (${userId}, ${routineId}, ${JSON.stringify(slots)}, NOW())
+      VALUES (${userId}, ${routineId}, ${slots}, NOW())
       ON CONFLICT (user_id, routine_id)
       DO UPDATE SET
         slots = EXCLUDED.slots,
@@ -118,6 +118,25 @@ export async function saveUserData(
 
 function defaultSlots(): (string | null)[] {
   return [null, null, null, null, null];
+}
+
+function parseSlots(value: unknown): (string | null)[] {
+  if (Array.isArray(value)) {
+    return normalizeSlots(value as (string | null)[]);
+  }
+
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value) as unknown;
+      if (Array.isArray(parsed)) {
+        return normalizeSlots(parsed as (string | null)[]);
+      }
+    } catch {
+      return defaultSlots();
+    }
+  }
+
+  return defaultSlots();
 }
 
 function normalizeSlots(slots: (string | null)[]): (string | null)[] {
